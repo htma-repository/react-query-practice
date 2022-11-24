@@ -30,6 +30,7 @@ const TodoList = () => {
       console.table(data.data.todos);
     },
     refetchOnWindowFocus: false,
+    keepPreviousData: true,
   });
 
   const prevTodoHandler = () => {
@@ -62,7 +63,6 @@ const TodoList = () => {
         <p>{error.message}</p>
       ) : (
         <>
-          {isFetching && <p>Refreshing...</p>}
           <ul className="flex flex-col gap-y-4">
             {todos?.data.todos.map((todo: Todo) => (
               <li
@@ -118,6 +118,7 @@ const TodoList = () => {
       >
         Refetch
       </button>
+      {isFetching && <p>Refreshing...</p>}
     </section>
   );
 };

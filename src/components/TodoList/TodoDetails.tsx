@@ -1,26 +1,41 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { Todo } from "../../hooks/useHttp";
 
 import useHttp from "../../hooks/useHttp";
+
+interface TodoData {
+  data: Todo;
+}
 
 const TodoDetails = () => {
   const { todoId } = useParams<string>();
   const { requestHttp } = useHttp();
 
+  const queryClient = useQueryClient();
+
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["todo-detail", todoId],
-    queryFn: () => {
-      return requestHttp({
+    queryFn: async (): Promise<Todo> => {
+      const response = await requestHttp({
         method: "GET",
         url: `/${todoId}`,
       });
+      return response.data;
     },
     onError: (error: { message: string }) => {
       console.error(error.message);
     },
+    // initialData: () => {
+    //   const todo = queryClient
+    //     .getQueryData(["todos-data", "todo-detail"])
+    //     ?.find((todo: any) => todo.id === todoId);
+
+    //   return todo;
+    // },
   });
 
-  console.log(isLoading);
+  // console.log(isLoading);
 
   let todoDetailContent;
 
@@ -30,10 +45,10 @@ const TodoDetails = () => {
   if (isError) {
     todoDetailContent = <p>{error.message}</p>;
   }
-  if (data?.data) {
+  if (data) {
     todoDetailContent = (
       <p>
-        {data?.data.id}: {data?.data.todo}
+        {data?.id}: {data?.todo}
       </p>
     );
   }
