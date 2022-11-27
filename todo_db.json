@@ -1,0 +1,44 @@
+{
+  "todo": [
+    {
+      "id": 1,
+      "todo": "Do something nice for someone I care about",
+      "isCompleted": false
+    },
+    {
+      "id": 2,
+      "todo": "Memorize the fifty states and their capitals",
+      "isCompleted": true
+    },
+    {
+      "id": 3,
+      "todo": "Watch a classic movie",
+      "isCompleted": false
+    },
+    {
+      "id": 4,
+      "todo": "Contribute code or a monetary donation to an open-source software project",
+      "isCompleted": false
+    },
+    {
+      "id": 5,
+      "todo": "Solve a Rubik's cube",
+      "isCompleted": false
+    },
+    {
+      "id": 6,
+      "todo": "Bake pastries for me and neighbor",
+      "isCompleted": false
+    },
+    {
+      "id": 7,
+      "todo": "Go see a Broadway production",
+      "isCompleted": false
+    },
+    {
+      "todo": "test",
+      "isCompleted": false,
+      "id": 8
+    }
+  ]
+}

@@ -26,10 +26,10 @@ const Navigation = () => {
             className="dropdown-content menu rounded-box menu-compact mt-3 w-52 bg-base-100 p-2 shadow"
           >
             <li>
-              <Link to={"/"}>Homepage</Link>
+              <Link to={"/"}>TodoList</Link>
             </li>
             <li>
-              <a>Portfolio</a>
+              <Link to={"infinite"}>Infinite Todos</Link>
             </li>
             <li>
               <a>About</a>

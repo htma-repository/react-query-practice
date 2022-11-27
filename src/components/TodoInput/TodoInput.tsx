@@ -1,22 +1,47 @@
-import React, { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import React, { useState, useContext } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import useHttp, { Todo } from "../../hooks/useHttp";
+import useHttp, { Todo, Data } from "../../hooks/useHttp";
+import { PaginationContext } from "../../context/Context";
+
+interface NewData {
+  data: Data;
+  status: number;
+  statusText: string;
+}
 
 const TodoInput = () => {
   const [todoInput, setTodoInput] = useState<string>("");
   const { requestHttp } = useHttp();
+  const { paginate } = useContext(PaginationContext);
 
-  const { data, isLoading, isError, error, mutate } = useMutation({
+  const queryClient = useQueryClient();
+
+  const { data, isSuccess, isLoading, isError, error, mutate } = useMutation({
     mutationFn: (todoData: Todo) => {
       return requestHttp({
         method: "POST",
-        url: "/add",
+        url: "/",
         data: todoData,
       });
     },
     onError: (error: { message: string }) => {
       console.error(error.message);
+    },
+    onSuccess: (data) => {
+      // queryClient.invalidateQueries({
+      //   queryKey: ["todos-data"],
+      // });
+      queryClient.setQueryData(
+        ["todos-data", paginate],
+        (oldQueryData: any) => {
+          console.log(oldQueryData);
+          // return {
+          //   ...oldQueryData,
+          //   data: [...oldQueryData.data, data.data],
+          // };
+        }
+      );
     },
   });
 
@@ -30,9 +55,8 @@ const TodoInput = () => {
     event.preventDefault();
 
     const todoData: Todo = {
-      userId: 10,
       todo: todoInput,
-      completed: false,
+      isCompleted: false,
     };
 
     mutate(todoData);
@@ -40,11 +64,12 @@ const TodoInput = () => {
     setTodoInput("");
   };
 
-  console.log(data?.data);
+  // console.log(data?.data);
 
   return (
     <section>
       {isLoading && <p>Send Todo...</p>}
+      {isSuccess && <p>Add Todo Successfully</p>}
       {isError && <p>{error.message}</p>}
       <form
         className="form-control m-auto flex w-full flex-col gap-y-4 md:w-1/2"

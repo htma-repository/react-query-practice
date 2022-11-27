@@ -16,39 +16,36 @@ const TodoDetails = () => {
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["todo-detail", todoId],
-    queryFn: async (): Promise<Todo> => {
-      const response = await requestHttp({
+    queryFn: () => {
+      const response = requestHttp({
         method: "GET",
         url: `/${todoId}`,
       });
-      return response.data;
-    },
-    onError: (error: { message: string }) => {
-      console.error(error.message);
+      return response;
     },
     // initialData: () => {
-    //   const todo = queryClient
-    //     .getQueryData(["todos-data", "todo-detail"])
-    //     ?.find((todo: any) => todo.id === todoId);
+    //   const todo = queryClient.getQueryData(["todos-data"]);
 
-    //   return todo;
+    //   console.log(todo);
+
+    //   return { data: todo };
     // },
   });
 
-  // console.log(isLoading);
+  // console.log(data);
 
   let todoDetailContent;
 
   if (isLoading) {
     todoDetailContent = <p>Loading...</p>;
   }
-  if (isError) {
+  if (isError && error instanceof Error) {
     todoDetailContent = <p>{error.message}</p>;
   }
   if (data) {
     todoDetailContent = (
       <p>
-        {data?.id}: {data?.todo}
+        {data?.data.id}: {data?.data.todo}
       </p>
     );
   }

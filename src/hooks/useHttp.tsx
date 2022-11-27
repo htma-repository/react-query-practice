@@ -1,11 +1,10 @@
 import { useCallback } from "react";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 
 export interface Todo {
   id?: number;
-  userId: number;
   todo: string;
-  completed: boolean;
+  isCompleted: boolean;
 }
 interface ConfigHttp {
   method: string;
@@ -13,8 +12,12 @@ interface ConfigHttp {
   data?: Todo;
 }
 
+export interface Data {
+  todos: Todo[];
+}
+
 const todosAPI = axios.create({
-  baseURL: "https://dummyjson.com/todos",
+  baseURL: "http://localhost:4000/todo",
 });
 
 const useHttp = () => {
@@ -30,7 +33,7 @@ const useHttp = () => {
       throw new Error("Failed get todo data");
     }
 
-    return response;
+    return response.data;
   }, []);
 
   return { requestHttp };
