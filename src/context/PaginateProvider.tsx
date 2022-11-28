@@ -13,13 +13,13 @@ const PaginateProvider = ({ children }: Props) => {
   };
 
   const prevPaginateHandler = () => {
-    if (paginate > 0) {
+    if (paginate !== 1) {
       setPaginate((prevState) => prevState - 1);
     }
   };
 
   const firstPaginateHandler = () => setPaginate(0);
-  const lastPaginateHandler = () => setPaginate(140);
+  const lastPaginateHandler = (last: number) => setPaginate(last);
   const value = {
     paginate,
     nextPaginateValue: nextPaginateHandler,

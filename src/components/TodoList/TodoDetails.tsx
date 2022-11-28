@@ -1,38 +1,53 @@
+import { useContext } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { Todo } from "../../hooks/useHttp";
 
 import useHttp from "../../hooks/useHttp";
+import { PaginationContext } from "../../context/Context";
 
-interface TodoData {
-  data: Todo;
-}
+// interface TodoData {
+//   data: Todo;
+// }
 
 const TodoDetails = () => {
   const { todoId } = useParams<string>();
   const { requestHttp } = useHttp();
+  const { paginate } = useContext(PaginationContext);
 
   const queryClient = useQueryClient();
 
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["todo-detail", todoId],
+  const {
+    data: todoDetail,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: [
+      "todo-detail",
+      typeof todoId === "string" ? Number(todoId) : null,
+    ],
     queryFn: () => {
-      const response = requestHttp({
+      return requestHttp({
         method: "GET",
-        url: `/${todoId}`,
+        url: `todo/${todoId}`,
       });
-      return response;
     },
     // initialData: () => {
-    //   const todo = queryClient.getQueryData(["todos-data"]);
+    //   const todo: Todo[] | undefined = queryClient.getQueryData([
+    //     "todos-data",
+    //     paginate,
+    //   ]);
 
-    //   console.log(todo);
+    //   const initTodo = todo?.find((todo) => todo.id === todoId);
 
-    //   return { data: todo };
+    //   if (initTodo) {
+    //     return initTodo;
+    //   } else {
+    //     return undefined;
+    //   }
     // },
   });
-
-  // console.log(data);
 
   let todoDetailContent;
 
@@ -42,10 +57,10 @@ const TodoDetails = () => {
   if (isError && error instanceof Error) {
     todoDetailContent = <p>{error.message}</p>;
   }
-  if (data) {
+  if (todoDetail) {
     todoDetailContent = (
       <p>
-        {data?.data.id}: {data?.data.todo}
+        {todoDetail.id}: {todoDetail.todo}
       </p>
     );
   }

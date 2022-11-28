@@ -34,11 +34,6 @@
       "id": 7,
       "todo": "Go see a Broadway production",
       "isCompleted": false
-    },
-    {
-      "todo": "test",
-      "isCompleted": false,
-      "id": 8
     }
   ]
 }

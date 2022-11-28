@@ -1,8 +1,8 @@
-import React, { useState, useContext } from "react";
+import React, { useContext } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import useHttp, { Todo, Data } from "../../hooks/useHttp";
-import { PaginationContext } from "../../context/Context";
+import { PaginationContext, UpdateTodoContext } from "../../context/Context";
 
 interface NewData {
   data: Data;
@@ -11,7 +11,9 @@ interface NewData {
 }
 
 const TodoInput = () => {
-  const [todoInput, setTodoInput] = useState<string>("");
+  // const [todoInput, setTodoInput] = useState<string>("");
+  const { todo, todoInputHandler, setTodoInput } =
+    useContext(UpdateTodoContext);
   const { requestHttp } = useHttp();
   const { paginate } = useContext(PaginationContext);
 
@@ -21,47 +23,51 @@ const TodoInput = () => {
     mutationFn: (todoData: Todo) => {
       return requestHttp({
         method: "POST",
-        url: "/",
+        url: "todo",
         data: todoData,
       });
     },
-    onError: (error: { message: string }) => {
-      console.error(error.message);
+    onError: (error) => {
+      if (error instanceof Error) {
+        console.error(error.message);
+      }
     },
     onSuccess: (data) => {
-      // queryClient.invalidateQueries({
-      //   queryKey: ["todos-data"],
+      queryClient.invalidateQueries({
+        queryKey: ["todos-data"],
+      });
+      // queryClient.setQueryData(["todos-data"], (oldQueryData: any) => {
+      //   console.log(oldQueryData);
+      //   return {
+      //     ...oldQueryData,
+      //     data: [...oldQueryData, data],
+      //   };
       // });
-      queryClient.setQueryData(
-        ["todos-data", paginate],
-        (oldQueryData: any) => {
-          console.log(oldQueryData);
-          // return {
-          //   ...oldQueryData,
-          //   data: [...oldQueryData.data, data.data],
-          // };
-        }
-      );
     },
   });
+
+  // console.log(data);
 
   const inputChangeHandler = (
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
-    setTodoInput(event.target.value);
+    todoInputHandler(event.target.value);
   };
 
   const onSubmitHandler = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const todoData: Todo = {
-      todo: todoInput,
+    // const todoData: Todo = {
+    //   todo: todoInput,
+    //   isCompleted: false,
+    // };
+
+    mutate(todo);
+
+    setTodoInput({
+      todo: "",
       isCompleted: false,
-    };
-
-    mutate(todoData);
-
-    setTodoInput("");
+    });
   };
 
   // console.log(data?.data);
@@ -70,7 +76,7 @@ const TodoInput = () => {
     <section>
       {isLoading && <p>Send Todo...</p>}
       {isSuccess && <p>Add Todo Successfully</p>}
-      {isError && <p>{error.message}</p>}
+      {isError && <p>{error instanceof Error ? error.message : null}</p>}
       <form
         className="form-control m-auto flex w-full flex-col gap-y-4 md:w-1/2"
         onSubmit={onSubmitHandler}
@@ -79,7 +85,7 @@ const TodoInput = () => {
           className="textarea-bordered textarea h-24 rounded"
           placeholder="Bio"
           onChange={inputChangeHandler}
-          value={todoInput}
+          value={todo.todo}
         ></textarea>
         <button
           type="submit"

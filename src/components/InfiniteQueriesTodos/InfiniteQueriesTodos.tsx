@@ -1,19 +1,10 @@
 import React, { Fragment } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
-import axios, { AxiosResponse } from "axios";
-interface Todo {
-  id: number;
-  todo: string;
-  isCompleted: boolean;
-}
-
-interface Todos {
-  todo: Todo[];
-}
+import useHttp, { Todo } from "../../hooks/useHttp";
 
 const InfiniteQueriesTodos = () => {
-  // const { requestHttp } = useHttp();
+  const { requestHttp } = useHttp();
 
   const {
     isLoading,
@@ -26,23 +17,23 @@ const InfiniteQueriesTodos = () => {
     isFetchingNextPage,
   } = useInfiniteQuery({
     queryKey: ["infinite-todos"],
-    queryFn: async ({ pageParam = 0 }) => {
+    queryFn: ({ pageParam = 0 }) => {
       // console.log({ pageParam });
-      const response = await axios({
+      return requestHttp({
         method: "GET",
-        url: `http://localhost:4000/todo?_page=${pageParam}`,
+        url: `todo?_page=${pageParam}&_limit=2`,
       });
-      return response.data;
     },
     getNextPageParam: (lastPage, pages) => {
       // console.log(pages);
+      console.log({ lastPage, pages });
       if (pages.length < 4) {
         return pages.length + 1;
       } else {
         return undefined;
       }
-      // console.log({ lastPage, pages });
     },
+    refetchOnWindowFocus: false,
   });
 
   let infiniteTodoContent;
@@ -59,10 +50,10 @@ const InfiniteQueriesTodos = () => {
     infiniteTodoContent = (
       <>
         <ul>
-          {data.pages.map((group: AxiosResponse<Todos>, index) => {
+          {data.pages.map((group, index) => {
             return (
               <Fragment key={index}>
-                {group.data.todo.map((todo) => {
+                {group.map((todo: Todo) => {
                   return (
                     <li key={todo.id}>
                       {todo.id}: {todo.todo}

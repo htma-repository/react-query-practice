@@ -17,7 +17,7 @@ export interface Data {
 }
 
 const todosAPI = axios.create({
-  baseURL: "http://localhost:4000/todo",
+  baseURL: "http://localhost:4000/",
 });
 
 const useHttp = () => {
@@ -29,7 +29,7 @@ const useHttp = () => {
       data,
     });
 
-    if (response.status !== 200) {
+    if (response.status > 300) {
       throw new Error("Failed get todo data");
     }
 

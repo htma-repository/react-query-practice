@@ -1,13 +1,14 @@
-import React, { useState, useContext } from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import useHttp, { Todo, Data } from "../../hooks/useHttp";
 import { PaginationContext } from "../../context/Context";
 
 const TodoList = () => {
-  // const [skipNum, setSkipNum] = useState<number>(0);
   const { requestHttp } = useHttp();
+  const queryClient = useQueryClient();
+
   const {
     paginate,
     nextPaginateValue,
@@ -28,7 +29,7 @@ const TodoList = () => {
     queryFn: () => {
       return requestHttp({
         method: "GET",
-        url: `?_page=${paginate}&_limit=2`,
+        url: `todo?_page=${paginate}&_limit=4`,
       });
     },
     onError: (error) => {
@@ -36,16 +37,8 @@ const TodoList = () => {
         console.error(error.message);
       }
     },
-    onSuccess: (data) => {
-      // console.table(data.data.todos);
-    },
-    refetchOnWindowFocus: false,
     keepPreviousData: true,
   });
-
-  // const sortTodos = todos?.data.todos.sort((a: Todo, b: Todo) => b.id! - a.id!);
-
-  // console.log(sortTodos);
 
   const prevTodoHandler = () => {
     if (paginate !== 0) {
@@ -54,7 +47,7 @@ const TodoList = () => {
   };
 
   const nextTodoHandler = () => {
-    if (paginate !== 4) {
+    if (paginate !== 5) {
       nextPaginateValue();
     }
   };
@@ -64,10 +57,30 @@ const TodoList = () => {
   };
 
   const lastTodoHandler = () => {
-    lastPaginateValue();
+    lastPaginateValue(5);
   };
 
-  console.log(todos);
+  const {
+    isLoading: isDeleteLoading,
+    isError: isDeleteError,
+    mutate,
+  } = useMutation({
+    mutationFn: (id: number) => {
+      return requestHttp({
+        method: "DELETE",
+        url: `todo/${id}`,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["todos-data"]);
+    },
+  });
+
+  const todoDeleteHandler = (id: number) => {
+    mutate(id);
+  };
+
+  const todoEditHandler = (todo: string) => {};
 
   return (
     <section className="mb-12 flex flex-col gap-y-5">
@@ -81,11 +94,27 @@ const TodoList = () => {
             {todos.map((todo: Todo) => (
               <li
                 key={todo.id}
-                className={`${todo.isCompleted ? "text-green-600" : ""}`}
+                className={`flex items-center gap-x-4 ${
+                  todo.isCompleted ? "text-green-600" : ""
+                }`}
               >
                 <Link to={`/${todo.id}`}>
                   {todo.id}: {todo.todo}
                 </Link>
+                <button
+                  className="btn-error rounded py-2 px-4"
+                  onClick={todoEditHandler.bind(null, todo.id!)}
+                >
+                  edit
+                </button>
+                <button
+                  className="btn-error rounded py-2 px-4"
+                  onClick={todoDeleteHandler.bind(null, todo.id!)}
+                >
+                  delete
+                </button>
+                {isDeleteLoading && <p>Deleting...</p>}
+                {isDeleteError && <p>Delete failed</p>}
               </li>
             ))}
           </ul>
@@ -94,35 +123,37 @@ const TodoList = () => {
       <div className="flex flex-row gap-x-4">
         <button
           className={`btn-primary w-fit rounded py-2 px-4 ${
-            paginate === 0 && "disabled:cursor-not-allowed disabled:opacity-70"
+            paginate === 1 && "disabled:cursor-not-allowed disabled:opacity-70"
           }`}
           onClick={firstTodoHandler}
-          disabled={paginate === 0}
+          disabled={paginate === 1}
         >
           First
         </button>
         <button
           className={`btn-primary w-fit rounded py-2 px-4 ${
-            paginate === 0 && "disabled:cursor-not-allowed disabled:opacity-70"
+            paginate === 1 && "disabled:cursor-not-allowed disabled:opacity-70"
           }`}
           onClick={prevTodoHandler}
-          disabled={paginate === 0}
+          disabled={paginate === 1}
         >
           Prev Todo
         </button>
         <button
-          className="btn-primary w-fit rounded py-2 px-4"
+          className={`btn-primary w-fit rounded py-2 px-4 ${
+            paginate === 5 && "disabled:cursor-not-allowed disabled:opacity-70"
+          }`}
           onClick={nextTodoHandler}
+          disabled={paginate === 5}
         >
           Next Todo
         </button>
         <button
           className={`btn-primary w-fit rounded py-2 px-4 ${
-            paginate === 140 &&
-            "disabled:cursor-not-allowed disabled:opacity-70"
+            paginate === 5 && "disabled:cursor-not-allowed disabled:opacity-70"
           }`}
           onClick={lastTodoHandler}
-          disabled={paginate === 140}
+          disabled={paginate === 5}
         >
           Last
         </button>
