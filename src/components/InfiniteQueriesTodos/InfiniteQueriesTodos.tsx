@@ -53,7 +53,7 @@ const InfiniteQueriesTodos = () => {
           {data.pages.map((group, index) => {
             return (
               <Fragment key={index}>
-                {group.map((todo: Todo) => {
+                {group.data.map((todo: Todo) => {
                   return (
                     <li key={todo.id}>
                       {todo.id}: {todo.todo}
@@ -67,7 +67,7 @@ const InfiniteQueriesTodos = () => {
         <button
           disabled={!hasNextPage}
           onClick={() => fetchNextPage()}
-          className="btn-primary py-2 px-4 disabled:cursor-not-allowed"
+          className="btn-primary py-2 px-4 disabled:cursor-not-allowed disabled:opacity-70"
         >
           Load More
         </button>

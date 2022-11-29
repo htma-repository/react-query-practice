@@ -1,32 +1,21 @@
 import React, { useState } from "react";
-import { UpdateTodoContext } from "./Context";
-import { Todo } from "../hooks/useHttp";
 
-type Props = {
-  children: React.ReactNode;
-};
+const updateTodoProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [todoInput, setTodoInput] = useState<string>("");
 
-const updateTodoProvider = ({ children }: Props) => {
-  const [todoInput, setTodoInput] = useState<Todo>({
-    todo: "",
-    isCompleted: false,
-  });
-
-  const todoInputHandler = (todoData: string) => {
-    setTodoInput((prevState) => ({ ...prevState, todo: todoData }));
-  };
+  // const todoInputHandler = (todoData: string) => {
+  //   setTodoInput((prevState) => ({ ...prevState, todo: todoData }));
+  // };
+  console.log({ todoInput });
 
   const value = {
     todo: todoInput,
     setTodoInput,
-    todoInputHandler,
   };
 
-  return (
-    <UpdateTodoContext.Provider value={value}>
-      {children}
-    </UpdateTodoContext.Provider>
-  );
+  return <></>;
 };
 
 export default updateTodoProvider;

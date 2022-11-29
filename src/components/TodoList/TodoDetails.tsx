@@ -60,7 +60,7 @@ const TodoDetails = () => {
   if (todoDetail) {
     todoDetailContent = (
       <p>
-        {todoDetail.id}: {todoDetail.todo}
+        {todoDetail.data.id}: {todoDetail.data.todo}
       </p>
     );
   }

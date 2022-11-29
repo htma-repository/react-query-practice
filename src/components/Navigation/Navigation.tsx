@@ -32,7 +32,7 @@ const Navigation = () => {
               <Link to={"infinite"}>Infinite Todos</Link>
             </li>
             <li>
-              <a>About</a>
+              <Link to={"paginate"}>Paginate Todos</Link>
             </li>
           </ul>
         </div>

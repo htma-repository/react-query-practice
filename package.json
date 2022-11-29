@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "serve-json": "json-server -w todo_db.json -p 4000"
   },
   "dependencies": {
     "@tanstack/react-query": "^4.16.1",

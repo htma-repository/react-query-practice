@@ -1,8 +1,8 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import useHttp, { Todo, Data } from "../../hooks/useHttp";
-import { PaginationContext, UpdateTodoContext } from "../../context/Context";
+import { PaginationContext } from "../../context/Context";
 
 interface NewData {
   data: Data;
@@ -11,9 +11,8 @@ interface NewData {
 }
 
 const TodoInput = () => {
-  // const [todoInput, setTodoInput] = useState<string>("");
-  const { todo, todoInputHandler, setTodoInput } =
-    useContext(UpdateTodoContext);
+  const [todoInput, setTodoInput] = useState<string>("");
+
   const { requestHttp } = useHttp();
   const { paginate } = useContext(PaginationContext);
 
@@ -36,13 +35,16 @@ const TodoInput = () => {
       queryClient.invalidateQueries({
         queryKey: ["todos-data"],
       });
-      // queryClient.setQueryData(["todos-data"], (oldQueryData: any) => {
-      //   console.log(oldQueryData);
-      //   return {
-      //     ...oldQueryData,
-      //     data: [...oldQueryData, data],
-      //   };
-      // });
+      // queryClient.setQueryData(
+      //   ["todos-data", paginate],
+      //   (oldQueryData: any) => {
+      //     console.log(oldQueryData);
+      //     return {
+      //       ...oldQueryData,
+      //       data: [...oldQueryData, data],
+      //     };
+      //   }
+      // );
     },
   });
 
@@ -51,7 +53,7 @@ const TodoInput = () => {
   const inputChangeHandler = (
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
-    todoInputHandler(event.target.value);
+    setTodoInput(event.target.value);
   };
 
   const onSubmitHandler = (event: React.FormEvent<HTMLFormElement>) => {
@@ -61,13 +63,14 @@ const TodoInput = () => {
     //   todo: todoInput,
     //   isCompleted: false,
     // };
-
-    mutate(todo);
-
-    setTodoInput({
-      todo: "",
+    const newTodo: Todo = {
+      todo: todoInput,
       isCompleted: false,
-    });
+    };
+
+    mutate(newTodo);
+
+    setTodoInput("");
   };
 
   // console.log(data?.data);
@@ -85,7 +88,7 @@ const TodoInput = () => {
           className="textarea-bordered textarea h-24 rounded"
           placeholder="Bio"
           onChange={inputChangeHandler}
-          value={todo.todo}
+          value={todoInput}
         ></textarea>
         <button
           type="submit"

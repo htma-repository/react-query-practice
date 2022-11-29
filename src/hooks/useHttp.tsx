@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 
 export interface Todo {
   id?: number;
-  todo: string;
+  todo: string | null;
   isCompleted: boolean;
 }
 interface ConfigHttp {
@@ -33,7 +33,7 @@ const useHttp = () => {
       throw new Error("Failed get todo data");
     }
 
-    return response.data;
+    return response;
   }, []);
 
   return { requestHttp };
