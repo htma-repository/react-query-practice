@@ -19,7 +19,7 @@ const TodoListPaginate = () => {
 
   const {
     data: todos,
-    isInitialLoading,
+    isLoading,
     isError,
     error,
     isFetching,
@@ -86,7 +86,7 @@ const TodoListPaginate = () => {
 
   return (
     <section className="mb-12 flex flex-col gap-y-5">
-      {isInitialLoading ? (
+      {isLoading ? (
         <p>Loading...</p>
       ) : isError ? (
         <p>{error instanceof Error ? error.message : null}</p>
@@ -103,12 +103,6 @@ const TodoListPaginate = () => {
                 <Link to={`/${todo.id}`}>
                   {todo.id}: {todo.todo}
                 </Link>
-                {/* <button
-                  className="btn-error rounded py-2 px-4"
-                  onClick={todoEditHandler.bind(null, todo.id)}
-                >
-                  edit
-                </button> */}
                 <button
                   className="btn-error rounded py-2 px-4"
                   onClick={todoDeleteHandler.bind(null, todo.id!)}

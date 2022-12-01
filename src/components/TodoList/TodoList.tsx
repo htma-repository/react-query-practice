@@ -27,7 +27,6 @@ const TodoList = () => {
         console.error(error.message);
       }
     },
-    keepPreviousData: true,
   });
 
   const {
@@ -58,6 +57,8 @@ const TodoList = () => {
         <p>{error instanceof Error ? error.message : null}</p>
       ) : (
         <>
+          {isDeleteLoading && <p>Deleting...</p>}
+          {isDeleteError && <p>Delete failed</p>}
           <ul className="flex flex-col gap-y-4">
             {todos?.data.map((todo: Todo) => (
               <li
@@ -75,8 +76,6 @@ const TodoList = () => {
                 >
                   delete
                 </button>
-                {isDeleteLoading && <p>Deleting...</p>}
-                {isDeleteError && <p>Delete failed</p>}
               </li>
             ))}
           </ul>

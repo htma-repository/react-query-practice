@@ -1,8 +1,7 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import useHttp, { Todo, Data } from "../../hooks/useHttp";
-import { PaginationContext } from "../../context/Context";
 
 interface NewData {
   data: Data;
@@ -14,11 +13,10 @@ const TodoInput = () => {
   const [todoInput, setTodoInput] = useState<string>("");
 
   const { requestHttp } = useHttp();
-  const { paginate } = useContext(PaginationContext);
 
   const queryClient = useQueryClient();
 
-  const { data, isSuccess, isLoading, isError, error, mutate } = useMutation({
+  const { isSuccess, isLoading, isError, error, mutate } = useMutation({
     mutationFn: (todoData: Todo) => {
       return requestHttp({
         method: "POST",
@@ -26,29 +24,48 @@ const TodoInput = () => {
         data: todoData,
       });
     },
-    onError: (error) => {
+    // onSuccess: (data) => {
+    //
+    // * Query Invalidation Start
+    // queryClient.invalidateQueries({ queryKey: ["todos-data"] });
+    // * Query Invalidation End
+    //
+    //
+    // * Handling Mutation Response Start
+    // queryClient.setQueryData(["todos-data"], (oldQueryData: any) => {
+    //   return {
+    //     ...oldQueryData,
+    //     data: [...oldQueryData.data, data.data],
+    //   };
+    //  });
+    // * Handling Mutation Response End
+    // },
+    //
+    //
+    // * Optimistic Update Start
+    onMutate: async (newTodo) => {
+      await queryClient.cancelQueries({ queryKey: ["todos-data"] });
+      const previousTodoData = queryClient.getQueryData(["todos-data"]);
+      queryClient.setQueryData(["todos-data"], (oldQueryData: any) => {
+        console.log(oldQueryData);
+        return {
+          ...oldQueryData,
+          data: [...oldQueryData.data, newTodo],
+        };
+      });
+      return { previousTodoData };
+    },
+    onError: (error, _newTodo, context) => {
+      queryClient.setQueryData(["todos-data"], context?.previousTodoData);
       if (error instanceof Error) {
         console.error(error.message);
       }
     },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({
-        queryKey: ["todos-data"],
-      });
-      // queryClient.setQueryData(
-      //   ["todos-data", paginate],
-      //   (oldQueryData: any) => {
-      //     console.log(oldQueryData);
-      //     return {
-      //       ...oldQueryData,
-      //       data: [...oldQueryData, data],
-      //     };
-      //   }
-      // );
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["todos-data"] });
     },
+    // * Optimistic Update End
   });
-
-  // console.log(data);
 
   const inputChangeHandler = (
     event: React.ChangeEvent<HTMLTextAreaElement>
@@ -59,10 +76,6 @@ const TodoInput = () => {
   const onSubmitHandler = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // const todoData: Todo = {
-    //   todo: todoInput,
-    //   isCompleted: false,
-    // };
     const newTodo: Todo = {
       todo: todoInput,
       isCompleted: false,
@@ -72,8 +85,6 @@ const TodoInput = () => {
 
     setTodoInput("");
   };
-
-  // console.log(data?.data);
 
   return (
     <section>
